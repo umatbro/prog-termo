@@ -12,9 +12,6 @@ Temperature t1(20,40);
 LiquidCrystal lcdDisplay(2,3,4,5,6,7);
 
 
-void mrugaj();
-
-
 void setup() {
   lcdDisplay.begin(16,2);
   lcdDisplay.setCursor(0,0);
