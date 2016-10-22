@@ -91,7 +91,7 @@ Button::Button(int pn)
 
 bool Button::isPushed()
 {
-	if(digitalRead(pin) == HIGH) return true;
+	if(digitalRead(pin) == LOW) return true;
 	else return false;
 }
 
