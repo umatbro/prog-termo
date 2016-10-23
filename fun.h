@@ -1,5 +1,5 @@
 #include <LiquidCrystal.h>
-
+#include <IRremote.h>
 
 /*
 TEMPERATURA
@@ -8,16 +8,16 @@ TEMPERATURA
 class Temperature
 {
 	private:
-	float value; //obecna wartość temperatury
+		float value; //obecna wartość temperatury
 	
 	public:
-	float desired; //pożądana temperatury
-	Temperature(float ,float); //konstruktor
-	float increaseDesired(float howMuch); //zwiększa oczekiwaną (desidred) wartośc o howMuch i zwraca wynik dodawania
-	float decreaseDesired(float howMuch); //zmniejsza oczekiwaną wartość (desired) o howMuch i zwraca wynik odejmowania
-	float getTempValue();
-	float tempSimulation(bool heating); //symulacja temperatury
-	bool isHeatingReq();
+		float 	desired; //pożądana temperatury
+				Temperature(float ,float); //konstruktor
+		float 	increaseDesired(float howMuch); //zwiększa oczekiwaną (desidred) wartośc o howMuch i zwraca wynik dodawania
+		float 	decreaseDesired(float howMuch); //zmniejsza oczekiwaną wartość (desired) o howMuch i zwraca wynik odejmowania
+		float 	getTempValue();
+		float 	tempSimulation(bool heating); //symulacja temperatury
+		bool 	isHeatingReq();
 };
 
 
@@ -94,6 +94,32 @@ bool Button::isPushed()
 	if(digitalRead(pin) == LOW) return true;
 	else return false;
 }
+
+
+
+
+/*
+		PILOT
+*/
+
+class RemoteButton
+{
+	private:
+		int hexCode1;
+		int hexCode2;
+		
+	public:
+		RemoteButton(int);
+};
+
+
+RemoteButton::RemoteButton(int h1)
+{
+	hexCode1 = h1;
+	hexCode2 = hexCode1 + 0x10000;
+}
+
+
 
 
 /*
