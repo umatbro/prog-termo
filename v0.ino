@@ -1,31 +1,52 @@
 #include <LiquidCrystal.h>
 #include "fun.h"
 
-const int LED = 9;
-const int buttonPlus = 11;
-const int buttonMinus = 10;
-const int buttonAccept = 12;
-int temperature = 14;
-int tempDesired = 0;
-Temperature t1(20,40);
+
+const int LED = 11;
+/*
+nieużywane przyciski
+Button buttonPlus(10);
+Button buttonMinus(11);
+Button buttonAccept(12);*/
+Temperature tValue(20);
+Temperature tDesired(45);
+bool ON = false;
 
 LiquidCrystal lcdDisplay(2,3,4,5,6,7);
 
 
-void setup() {
-  lcdDisplay.begin(16,2);
-  lcdDisplay.setCursor(0,0);
-  lcdDisplay.print("Temperatura: ");
-  lcdDisplay.setCursor(14,0);
-  lcdDisplay.print((String)t1.getTempValue());
-  
-  lcdDisplay.setCursor(0,1);
-  lcdDisplay.print("Ustaw temp.");
-  lcdDisplay.setCursor(15,1);
-  lcdDisplay.print((String)t1.desired +" st.C");
-}
+//funkcje
+//void lcd16RollString (LiquidCrystal lcd, String napis, int rzad);
+//void displayTemp(float value, LiquidCrystal lcd, int row); //wyświetl wartość value temperatury w wierszu row wyświetlacza lcd
 
+
+void setup() {
+	//ustawienie pinów
+	pinMode(LED,OUTPUT);
+	digitalWrite(LED,LOW);
+	Serial.begin(9600);
+	
+	//ustawienie ekranu
+	  lcdDisplay.begin(16,2);
+	  lcdDisplay.setCursor(0,0);
+	  lcdDisplay.print("Temperatura: ");
+	  displayTemp(tValue.getTempValue(),lcdDisplay,0);
+	  
+	  lcdDisplay.setCursor(0,1);
+	  lcdDisplay.print("Ustaw temp.");
+	  displayTemp(tDesired.value(),lcdDisplay,1);
+}
+RegulacjaPID reg;
 void loop() 
 {
-
+	displayTemp(tDesired.value(), lcdDisplay, 1);
+	displayTemp(tValue.getTempValue(), lcdDisplay, 0);
+	
+	tempSimul(reg,tValue.getTempValue(), tDesired.value());
+	Serial.print("Set: ");
+	Serial.print(tDesired.value());
+	Serial.print("\tTemp: ");
+	Serial.println(tValue.getTempValue());
 }
+
+
