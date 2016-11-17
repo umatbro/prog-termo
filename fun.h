@@ -50,7 +50,7 @@ public:
 {
     float k=20;
     float k_i = 0;
-    float k_d = 0;
+    float k_d = 10;
 
     //zmienne pomocnicze
     float p,i,d,r;
