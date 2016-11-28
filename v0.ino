@@ -18,9 +18,10 @@ LiquidCrystal lcdDisplay(2,3,4,5,6,7);
 //funkcje
 //void lcd16RollString (LiquidCrystal lcd, String napis, int rzad);
 //void displayTemp(float value, LiquidCrystal lcd, int row); //wyświetl wartość value temperatury w wierszu row wyświetlacza lcd
-
+float tValueFloat;
 
 void setup() {
+  tValueFloat = tValue.getTempValue();
 	//ustawienie pinów
 	pinMode(LED,OUTPUT);
 	digitalWrite(LED,LOW);
@@ -36,17 +37,15 @@ void setup() {
 	  lcdDisplay.print("Ustaw temp.");
 	  displayTemp(tDesired.value(),lcdDisplay,1);
 }
+
 RegulacjaPID reg;
 void loop() 
 {
+  
 	displayTemp(tDesired.value(), lcdDisplay, 1);
-	displayTemp(tValue.getTempValue(), lcdDisplay, 0);
+	displayTemp(tValueFloat, lcdDisplay, 0);
 	
-	tempSimul(reg,tValue.getTempValue(), tDesired.value());
-	Serial.print("Set: ");
-	Serial.print(tDesired.value());
-	Serial.print("\tTemp: ");
-	Serial.println(tValue.getTempValue());
+	tempSimul(reg, tValueFloat, tDesired.value());
 }
 
 

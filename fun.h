@@ -46,9 +46,9 @@ private:
 public:
 	float regulator(float w_zad, float wy_o)
 {
-    float k=20;
-    float k_i = 2;
-    float k_d = 0;
+    float k=500;
+    float k_i = 3;
+    float k_d = 0.9;
 
     //zmienne pomocnicze
     float p,i,d,r;
