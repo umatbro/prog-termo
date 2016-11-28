@@ -17,8 +17,6 @@ class Temperature
 		float 	decreaseDesired(float howMuch); //zmniejsza oczekiwaną wartość (desired) o howMuch i zwraca wynik odejmowania
 		float 	getTempValue();
 		float	value();
-		float 	tempSimulation(); //symulacja temperatury
-		bool 	isHeatingReq();
 };
 
 
@@ -49,31 +47,31 @@ public:
 	float regulator(float w_zad, float wy_o)
 {
     float k=20;
-    float k_i = 0;
-    float k_d = 10;
+    float k_i = 2;
+    float k_d = 0;
 
     //zmienne pomocnicze
     float p,i,d,r;
     float u; //uchyb regulacji
-    static float u_p = 0; //uchyb regulacji w poprzednim wywo�aniu
-    static float su = 0; //suma minionych uchyb�w regulacji
+    static float u_p = 0; //uchyb regulacji w poprzednim wywołaniu
+    static float su = 0; //suma minionych uchybów regulacji
     u = w_zad - wy_o; // aktualny uchyb regulacji
 
 // wyznaczenie skladnika proporcjonalnego
     p = k * u;
 
 // wyznaczenie sk�adnika ca�kowego
-su = su + u; //najpierw trzeba wyliczy� sum� wszystkich uchyb�w;
+su = su + u; //najpierw trzeba wyliczyć sumę wszystkich uchybów;
 i = k_i * su;
 
-// wyznaczenie sk�adnika D
+// wyznaczenie składnika D
 d = k_d * (u-u_p);
-u_p = u; //zapami�taj chwilow� warto�� uchybu dla przysz�ych oblicze�
+u_p = u; //zapamitaj chwilową wartość uchybu dla przyszłych obliczeń
 
-r = p + i + d; //sygna� wyj�ciowy regulatora
+r = p + i + d; //sygnał wyjściowy regulatora
 
 //ograniczenia regulowanej wartości
-if (r < 0) r = 0; //czyli wyp�yw nie mo�e by� dodatni
+if (r < 0) r = 0; //czyli moc nie może być ujemna
 if (r > 100) r = 90;
 
     return r;
@@ -86,7 +84,7 @@ if (r > 100) r = 90;
 
 /*
 	------------------------------------------------------------------
-							FUNKCJE
+							METODY
 	------------------------------------------------------------------
 */
 
@@ -123,32 +121,6 @@ float Temperature::value()
 	return val;
 }
 
-
-float Temperature::tempSimulation()
-{
-	if (tempGrowth == true && val < desired+5)
-	{
-		digitalWrite(11,HIGH);
-		delay(500);
-		val += 0.5;
-		if(val == desired+5) tempGrowth = false;
-		return val;
-	}
-	else 
-	{
-		digitalWrite(11,LOW);
-		delay(500);
-		val -= 0.5;
-		if ( val < desired - 5 ) tempGrowth = true;
-		return val;
-	}
-}
-
-bool Temperature::isHeatingReq()
-{
-	if(val < desired + 5) return true;
-	else if (val > desired - 3) return false;
-}
 
 	
 /*------------------------------BUTTON------------------------------------*/
@@ -213,20 +185,24 @@ extern void displayTemp(float value, LiquidCrystal lcd, int row)
 	}
 }
 
-extern void tempSimul(RegulacjaPID regulacja, float tValue, float tDesired)
+extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired)
 {
-	while(true)
-	{
+	//while(true)
+	//{
 	int wspolczynnik;
 	wspolczynnik =(int)(regulacja.regulator(tDesired,tValue));
 	tValue += (wspolczynnik/10)*0.5;
 	
-	Serial.print("Set: ");
+	//Serial.print("Set: ");
 	Serial.print(tDesired);
-	Serial.print("\tTemp: ");
+	//Serial.print("\tTemp: ");
+	Serial.print("\t");
 	Serial.println(tValue);
-	tValue--;
+	randomSeed(analogRead(A5));
+	float randTemp = (random(0,700))/100;
+	tValue -= randTemp;
 	analogWrite(11,map(wspolczynnik,0,100,0,255));
-	delay(200);}
+	delay(200);
+	//}
 }
 
