@@ -1,4 +1,3 @@
-
 #include <LiquidCrystal.h>
 #include <SoftwareSerial.h>
 #include "fun.h"
@@ -16,10 +15,25 @@ RegulacjaPID reg;
 boolean isON = false;
 Button *recentlyPressed; //flaga recently pressed
 
+//RS485
+const byte rxPin = 0;
+const byte txPin = 1;
+const byte receiveEnablePin = 11;
+const byte dataEnablePin = 12;
+SoftwareSerial rs485(rxPin, txPin);
+
+
 float tValueFloat;
 void setup() {
-	 tValueFloat = tValue.getTempValue();
+	tValueFloat = tValue.getTempValue();
 	Serial.begin(9600);
+	
+	//ustawienia rs485
+	rs485.begin(9600);
+	pinMode(receiveEnablePin,OUTPUT);
+	pinMode(dataEnablePin,OUTPUT);
+	digitalWrite(receiveEnablePin,LOW);
+	digitalWrite(dataEnablePin,HIGH);
 	//ustawienie pinów
 	
 	//ustawienie ekranu
