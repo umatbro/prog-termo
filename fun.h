@@ -16,7 +16,7 @@ class Temperature
 	
 	public:
 		float 	desired; //pożądana wartosc temperatury - nieużywane
-				Temperature(float); //konstruktor
+				Temperature(float=0); //konstruktor
 		float 	increaseDesired(float howMuch); //zwiększa oczekiwaną (desidred) wartośc o howMuch i zwraca wynik dodawania
 		float 	decreaseDesired(float howMuch); //zmniejsza oczekiwaną wartość (desired) o howMuch i zwraca wynik odejmowania
 		float 	getTempValue();

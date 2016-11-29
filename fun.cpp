@@ -11,7 +11,7 @@
 /* ------------------------TEMPERATURE----------------------------- */
 
 
-Temperature::Temperature(float tv=14)
+Temperature::Temperature(float tv)
 {
 	val = tv;
 	//desired = td;
@@ -159,9 +159,7 @@ extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired)
 	wspolczynnik =(int)(regulacja.regulator(tDesired,tValue));
 	tValue += (wspolczynnik/10)*0.5;
 	
-	//Serial.print("Set: ");
 	Serial.print(tDesired);
-	//Serial.print("\tTemp: ");
 	Serial.print("\t");
 	Serial.println(tValue);
 	randomSeed(analogRead(A5));
