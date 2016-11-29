@@ -28,7 +28,7 @@ void setup() {
 	lcdDisplay.print("USTAW   |  START");
 	  
 	lcdDisplay.setCursor(0,1);
-	lcdDisplay.print("-/+");
+	lcdDisplay.print("-/+"+(String)(tValueFloat));
 	displayTemp(tDesired.value(),lcdDisplay,1);
 }
 
@@ -46,7 +46,7 @@ void loop()
 			lcdDisplay.print("USTAW   |  START");
 		  
 			lcdDisplay.setCursor(0,1);
-			lcdDisplay.print("-/+");
+			lcdDisplay.print("-/+"+(String)(tValueFloat));
 			displayTemp(tDesired.value(),lcdDisplay,1);
 		}
 		else if(isON)
@@ -94,5 +94,3 @@ void loop()
 		tempSimul(reg, tValueFloat, tDesired.value());
 	}
 }
-
-
