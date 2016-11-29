@@ -87,22 +87,23 @@ float RegulacjaPID::regulator(float w_zad, float wy_o)
 	// wyznaczenie skladnika proporcjonalnego
     p = k * u;
 
-	// wyznaczenie sk?adnika ca?kowego
-	su = su + u; //najpierw trzeba wyliczy� sum� wszystkich uchyb�w;
+	// wyznaczenie składnika ca?kowego
+	su = su + u; //najpierw trzeba wyliczyć sumę wszystkich uchybów;
 	i = k_i * su;
 
-	// wyznaczenie sk�adnika D
+	// wyznaczenie składnika D
 	d = k_d * (u-u_p);
-	u_p = u; //zapamitaj chwilow� warto�� uchybu dla przysz�ych oblicze�
+	u_p = u; //zapamitaj chwilową wartość uchybu dla przyszłych obliczeń
 
-	r = p + i + d; //sygna� wyj�ciowy regulatora
+	r = p + i + d; //sygnał wyjściowy regulatora
 
-	//ograniczenia regulowanej warto�ci
-	if (r < 0) r = 0; //czyli moc nie mo�e by� ujemna
+	//ograniczenia regulowanej wartości
+	if (r < 0) r = 0; //czyli moc nie może być ujemna
 	if (r > 100) r = 90;
 
     return r;
 }
+
 
 /*
 	INNE

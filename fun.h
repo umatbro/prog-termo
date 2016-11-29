@@ -1,6 +1,10 @@
 ﻿#include <LiquidCrystal.h>
-#include <Arduino.h>
+#include <SoftwareSerial.h>
+#include "Arduino.h"
+#include "Button/Button.h"
 
+
+class Button;
 /*
 TEMPERATURA
 */
@@ -9,10 +13,9 @@ class Temperature
 {
 	private:
 		float val; //obecna wartość temperatury
-		bool tempGrowth; //!!!tylko do tempSimul
 	
 	public:
-		float 	desired; //pożądana temperatury
+		float 	desired; //pożądana wartosc temperatury - nieużywane
 				Temperature(float); //konstruktor
 		float 	increaseDesired(float howMuch); //zwiększa oczekiwaną (desidred) wartośc o howMuch i zwraca wynik dodawania
 		float 	decreaseDesired(float howMuch); //zmniejsza oczekiwaną wartość (desired) o howMuch i zwraca wynik odejmowania
