@@ -33,6 +33,7 @@ class Button{
     bool wasPressed();
     bool stateChanged();
 	bool uniquePress();
+	unsigned long timePressed();
   private: 
     uint8_t pin;
     uint8_t mode;

@@ -91,3 +91,20 @@ bool Button::stateChanged(void){
 bool Button::uniquePress(void){
     return (isPressed() && stateChanged());
 }
+
+
+/*
+|| Zwraca czas od początku naciśnięcia przycisku do jego zwolnienia w milisekundach
+*/
+unsigned long Button::timePressed()
+{
+	static unsigned long sTart = 0;
+	static unsigned long sTop = 0;
+	if (uniquePress())
+		sTart = millis();
+	if (!isPressed()) sTart = millis();
+	
+	sTop = millis();
+	if (!isPressed()) return 0;
+	else return (sTop - sTart);
+}
