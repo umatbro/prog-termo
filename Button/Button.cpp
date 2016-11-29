@@ -96,7 +96,7 @@ bool Button::uniquePress(void){
 /*
 || Zwraca czas od początku naciśnięcia przycisku do jego zwolnienia w milisekundach
 */
-unsigned long Button::timePressed()
+unsigned long Button::timePressed(void)
 {
 	static unsigned long sTart = 0;
 	static unsigned long sTop = 0;

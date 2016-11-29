@@ -18,6 +18,7 @@ stateChanged	KEYWORD2
 uniquePress	KEYWORD2
 pullup	KEYWORD2
 pulldown	KEYWORD2
+timePressed KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
