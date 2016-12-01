@@ -1,10 +1,12 @@
 #include <LiquidCrystal.h>
 #include <SoftwareSerial.h>
 #include "fun.h"
-//#include "Button/Button.h"
 
 //wyświetlacz
 LiquidCrystal lcdDisplay(2,3,4,5,6,7);
+
+//Timery
+Timer tempMeasureTimer;
 
 //przyciski
 Button buttonPlus(8,PULLUP);
@@ -43,17 +45,18 @@ void setup() {
 	digitalWrite(dataEnablePin,HIGH);
 	//ustawienie pinów
 	
+	//ustawienie ekranu
+	lcdDisplay.begin(16,2);
 	
-	//oczekiwanie na termoparę
+/*	//oczekiwanie na termoparę
 	lcdDisplay.clear();
 	lcdDisplay.setCursor(0,0);
 	lcdDisplay.print("Oczekiwanie na");
 	lcdDisplay.setCursor(0,1);
 	lcdDisplay.print("termopare");
-	while(thermocouple.readCelsius() == 0) {}
-	
-	//ustawienie ekranu
-	lcdDisplay.begin(16,2);
+	while(thermocouple.readCelsius() == 0 || isnan(thermocouple.readCelsius()) ) {delay(2000);}
+*/	
+	lcdDisplay.clear();
 	lcdDisplay.setCursor(0,0);
 	lcdDisplay.print("USTAW   |  START");
 	  
@@ -66,7 +69,18 @@ void setup() {
 
 void loop() 
 {
-	boolean sTimer = stepTimer(500);
+	//BŁĄD - nie ma podłączonej termopary, jak najszybciej wszystko wyłączyć
+	while(thermocouple.readCelsius() == 0 || isnan(thermocouple.readCelsius()) ) 
+	{
+		lcdDisplay.clear();
+		lcdDisplay.setCursor(0,0);
+		lcdDisplay.print("BLAD!!! Sprawdz");
+		lcdDisplay.setCursor(0,1);
+		lcdDisplay.print("termopare");
+		delay(2000);
+	}
+
+	boolean sTimer = tempMeasureTimer.stepTimer(500);
 	if(buttonAccept.uniquePress()) 
 	{
 		isON = !isON;

@@ -20,23 +20,36 @@ class Temperature
 				Temperature(float=0); //konstruktor
 		float 	increaseDesired(float howMuch); //zwiększa oczekiwaną (desidred) wartośc o howMuch i zwraca wynik dodawania
 		float 	decreaseDesired(float howMuch); //zmniejsza oczekiwaną wartość (desired) o howMuch i zwraca wynik odejmowania
-		float 	getTempValue(MAX6675 thermocouple);
+		float 	getTempValue(MAX6675);
 		float	value();
 		float 	set(float); //ustawia podaną temperaturę i zwraca jej wartość
 };
 
 
+/*
+	TIMER
+*/
+
+class Timer
+{
+	private:
+		unsigned long 	millisecNow;
+		unsigned long 	millisecStart;
+	public: 
+						Timer();
+		long int		threshold;
+		boolean 		stepTimer(unsigned long); //zwraca true cyklicznie co ileś milisekund, pozwala na wykonanie jakiejś akcji co pewien czas
+};
+
 
 /*	
 	Regulator PID
-	
 */
 	
 class RegulacjaPID 
 {
 private:
 	
-
 public:
 	float regulator(float w_zad, float wy_o);
 };
@@ -47,4 +60,4 @@ public:
 extern void lcd16RollString(LiquidCrystal lcd, String napis, int rzad);
 extern void displayTemp(float value, LiquidCrystal lcd, int row);
 extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired);
-extern boolean stepTimer(int miliseconds); // zwraca true cyklicznie co ileś milisekund, pozwala na wykonanie jakiejś akcji co pewien czas
+extern boolean stepTimer(int miliseconds); 

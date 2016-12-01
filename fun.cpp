@@ -46,9 +46,27 @@ float Temperature::set(float setting)
 }
 
 
+/*----------------------------TIMER----------------------------------------*/
+Timer::Timer()
+{
+	millisecNow = millis();
+	millisecStart = millis();
+	threshold = 20;
+}
+
+boolean Timer::stepTimer(unsigned long milliseconds)
+{
+	millisecNow = millis();
+	if( (millisecNow - millisecStart > milliseconds) && (millisecNow - millisecStart)%milliseconds < threshold )
+	{
+		millisecStart = millis();
+		return true;
+	}
+	else return false;
+}
 
 
-//--------------------------REGULATOR PID--------------------------------*/
+/*--------------------------REGULATOR PID--------------------------------*/
 float RegulacjaPID::regulator(float w_zad, float wy_o) 
 {
     float k=200;
@@ -147,19 +165,3 @@ extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired)
 	delay(200);
 	//}
 }
-
-
-extern boolean stepTimer(int milliseconds)
-{
-	static int millisecNow;
-	static int millisecStart = millis();
-	millisecNow = millis();
-
-	if ( (millisecNow - millisecStart > milliseconds) && (millisecNow - millisecStart)%milliseconds < 20 ) 
-	{
-		millisecStart = millis();
-		return true;
-	}
-	else return false;
-}
-
