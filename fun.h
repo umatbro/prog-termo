@@ -41,6 +41,16 @@ class Timer
 		boolean 		stepTimer(unsigned long); //zwraca true cyklicznie co ileś milisekund, pozwala na wykonanie jakiejś akcji co pewien czas
 };
 
+/*
+	POWER SUPPLY
+*/
+class PowerSupply
+{
+	private:
+		
+	public:
+		
+};
 
 /*	
 	Regulator PID

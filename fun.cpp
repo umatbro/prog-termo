@@ -95,7 +95,7 @@ float RegulacjaPID::regulator(float w_zad, float wy_o)
 
 	//ograniczenia regulowanej wartości
 	if (r < 0) r = 0; //czyli moc nie może być ujemna
-	if (r > 100) r = 90;
+	if (r > 100) r = 100;
 
     return r;
 }
@@ -165,3 +165,4 @@ extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired)
 	delay(200);
 	//}
 }
+
