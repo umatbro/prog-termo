@@ -4,7 +4,6 @@
 #include "Button/Button.h"
 #include "max6675.h"
 
-
 class Button;
 /*
 TEMPERATURA
@@ -42,14 +41,18 @@ class Timer
 };
 
 /*
-	POWER SUPPLY
+	POWER SUPPLY - MANSON 2405
 */
-class PowerSupply
+class Manson2405
 {
 	private:
 		
 	public:
-		
+		void sendCommand(String, SoftwareSerial); //wysyła komendę do zasilacza
+		void sendBytes(String,byte,byte);
+		String getResponse(SoftwareSerial); // zwraca odpowiedź zasilacza
+		String startSession(SoftwareSerial); // wyłącza przedni panel
+		String endSession(SoftwareSerial); // włącza przedni panel i kończy sesję
 };
 
 /*	

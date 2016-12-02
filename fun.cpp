@@ -66,6 +66,23 @@ boolean Timer::stepTimer(unsigned long milliseconds)
 }
 
 
+/*----------------------------MANSON 2405---------------------------------*/
+String Manson2405::getResponse(SoftwareSerial rs485)
+{
+	String response;
+	//while(rs485.read() != -1);
+	//zmiana na odczyt
+	digitalWrite(11,HIGH); //receiveEnablePin
+	digitalWrite(12,LOW); //dataEnablePin
+	while(!rs485.available()) {}
+	response = rs485.readStringUntil(0x0D);
+	//ustawienie na wysyłanie
+	digitalWrite(11,LOW);
+	digitalWrite(12,HIGH);
+	return response;
+}
+
+
 /*--------------------------REGULATOR PID--------------------------------*/
 float RegulacjaPID::regulator(float w_zad, float wy_o) 
 {
