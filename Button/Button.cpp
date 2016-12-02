@@ -31,6 +31,8 @@ Button::Button(uint8_t buttonPin, uint8_t buttonMode){
 	buttonMode==PULLDOWN ? pulldown() : pullup();
     state = 0;
     bitWrite(state,CURRENT,!mode);
+	//sTart = 0;
+	//sTop = 0;
 }
 
 /*

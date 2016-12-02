@@ -38,4 +38,6 @@ class Button{
     uint8_t pin;
     uint8_t mode;
     uint8_t state;
+	//unsigned long sTart;
+	//unsigned long sTop;
 };
