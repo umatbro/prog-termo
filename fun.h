@@ -46,8 +46,13 @@ class Timer
 class Manson2405
 {
 	private:
-		
+		//SoftwareSerial rs485; //połązcenie z zasilaczem
+		//const byte rxPin = 0;
+		//const byte txPin = 1;
+		//const byte receiveEnablePin = 11;
+		//const byte dataEnablePin = 12;
 	public:
+		//Manson2405(rs485,byte=0,byte=1,byte=11,byte=12);
 		void sendCommand(String, SoftwareSerial); //wysyła komendę do zasilacza
 		void sendBytes(String,byte,byte);
 		String getResponse(SoftwareSerial); // zwraca odpowiedź zasilacza

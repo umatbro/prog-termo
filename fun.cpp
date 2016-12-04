@@ -67,10 +67,12 @@ boolean Timer::stepTimer(unsigned long milliseconds)
 
 
 /*----------------------------MANSON 2405---------------------------------*/
+
 String Manson2405::getResponse(SoftwareSerial rs485)
 {
+	rs485.begin(9600);
 	String response;
-	//while(rs485.read() != -1);
+	while(rs485.read() != -1);
 	//zmiana na odczyt
 	digitalWrite(11,HIGH); //receiveEnablePin
 	digitalWrite(12,LOW); //dataEnablePin
@@ -79,6 +81,7 @@ String Manson2405::getResponse(SoftwareSerial rs485)
 	//ustawienie na wysyłanie
 	digitalWrite(11,LOW);
 	digitalWrite(12,HIGH);
+	rs485.end();
 	return response;
 }
 
