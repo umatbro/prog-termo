@@ -306,8 +306,8 @@ void loop()
 						lcdDisplay.print("C:");
 						lcdDisplay.setCursor(10,1);
 						lcdDisplay.print("T:");
-						current = 50;
-						sendCommand(rs485,"CURR"+psAdressString+"050");
+						current = 20;
+						sendCommand(rs485,"CURR"+psAdressString+"020");
 						Timer timerReg;
 						while(!buttonAccept.uniquePress())
 						{
@@ -339,10 +339,11 @@ void loop()
 								sendCommand(rs485,"VOLT"+psAdressString+voltageString);
 								
 								//warunek bezpieczeństwa
-								if(temperature > 60) break;
+								if(temperature > tDesired.value() + 5) break;
 							}
 						}
 						sendCommand(rs485,"VOLT"+psAdressString+"000");
+						delay(10);
 						sendCommand(rs485,"CURR"+psAdressString+"000");
 					}
 					break;
