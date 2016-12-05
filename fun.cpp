@@ -124,6 +124,12 @@ float RegulacjaPID::regulator(float w_zad, float wy_o)
 /*
 	INNE
 */
+extern void lcdPrint(LiquidCrystal lcd, String napis, int rzad)
+{
+	lcd.setCursor(0,rzad);
+	lcd.print(napis);
+}
+
 //przewijanie napisu po ekranie gdy ilo�� znak�w wi�ksza od 16 
 extern void lcd16RollString(LiquidCrystal lcd, String napis, int rzad)
 {
@@ -186,3 +192,10 @@ extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired)
 	//}
 }
 
+//WYŚLIJ KOMENDĘ
+extern String sendCommand(SoftwareSerial rs, String caption)
+{
+	rs.print(caption);
+	rs.write(0x0D);
+	return caption;
+}

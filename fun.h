@@ -75,7 +75,9 @@ public:
 
 
 //INNE
+extern void lcdPrint(LiquidCrystal lcd, String napis, int rzad);
 extern void lcd16RollString(LiquidCrystal lcd, String napis, int rzad);
 extern void displayTemp(float value, LiquidCrystal lcd, int row);
 extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired);
 extern boolean stepTimer(int miliseconds); 
+extern String sendCommand(SoftwareSerial rs, String caption);
