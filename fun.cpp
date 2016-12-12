@@ -30,7 +30,7 @@ float Temperature::decreaseDesired(float howMuch)
 
 float Temperature::getTempValue(MAX6675 thermocouple)
 {
-	return thermocouple.readCelsius();
+	return 0.95*(thermocouple.readCelsius()) - 11.58;
 }
 	
 float Temperature::value()
@@ -67,10 +67,12 @@ boolean Timer::stepTimer(unsigned long milliseconds)
 
 
 /*----------------------------MANSON 2405---------------------------------*/
+
 String Manson2405::getResponse(SoftwareSerial rs485)
 {
+	rs485.begin(9600);
 	String response;
-	//while(rs485.read() != -1);
+	while(rs485.read() != -1);
 	//zmiana na odczyt
 	digitalWrite(11,HIGH); //receiveEnablePin
 	digitalWrite(12,LOW); //dataEnablePin
@@ -79,6 +81,7 @@ String Manson2405::getResponse(SoftwareSerial rs485)
 	//ustawienie na wysyłanie
 	digitalWrite(11,LOW);
 	digitalWrite(12,HIGH);
+	rs485.end();
 	return response;
 }
 
@@ -121,6 +124,12 @@ float RegulacjaPID::regulator(float w_zad, float wy_o)
 /*
 	INNE
 */
+extern void lcdPrint(LiquidCrystal lcd, String napis, int rzad)
+{
+	lcd.setCursor(0,rzad);
+	lcd.print(napis);
+}
+
 //przewijanie napisu po ekranie gdy ilo�� znak�w wi�ksza od 16 
 extern void lcd16RollString(LiquidCrystal lcd, String napis, int rzad)
 {
@@ -183,3 +192,10 @@ extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired)
 	//}
 }
 
+//WYŚLIJ KOMENDĘ
+extern String sendCommand(SoftwareSerial rs, String caption)
+{
+	rs.print(caption);
+	rs.write(0x0D);
+	return caption;
+}
