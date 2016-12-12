@@ -30,7 +30,7 @@ float Temperature::decreaseDesired(float howMuch)
 
 float Temperature::getTempValue(MAX6675 thermocouple)
 {
-	return thermocouple.readCelsius();
+	return 0.95*(thermocouple.readCelsius()) - 11.58;
 }
 	
 float Temperature::value()
