@@ -14,7 +14,7 @@ Button buttonPlus(8,PULLUP);
 Button buttonMinus(9,PULLUP);
 Button buttonAccept(10,PULLUP);
 Temperature tValue(20);
-Temperature tDesired(45);
+Temperature tDesired(25);
 RegulacjaPID reg;
 
 //inne
@@ -41,7 +41,7 @@ MAX6675 thermocouple(sckPin, csPin, soPin);
 //Zasilacz Manson2405
 Manson2405 powerSupply;
 int voltage = 0, current = 0;
-int maxVoltage = 200; //wartości napięcia w woltach = voltage/10; wartości prądu w amperach = current/100;
+int maxVoltage = 150; //wartości napięcia w woltach = voltage/10; wartości prądu w amperach = current/100;
 
 
 void setup() {
@@ -86,7 +86,7 @@ void loop()
 			lcdDisplay.print("termopare");
 			delay(2000);
 			lcdDisplay.clear();
-		}	
+		}
 	}
 
 	if(buttonAccept.uniquePress()) 
@@ -98,8 +98,6 @@ void loop()
 		if(menuOption > 3) menuOption = 1;
 		lcdDisplay.clear();
 	}
-	//rs485.println(buttonAccept.timePressed());
-  
   
 	switch(menuOption)
 	{
@@ -188,37 +186,34 @@ void loop()
 					{
 						case 1:  //rozpoczęcie sesji
 						{
-						if(buttonPlus.isPressed()) //submenu wybor adresu
-						{				
-							lcdDisplay.clear();
-							lcdPrint(lcdDisplay,"Adres: ",0);									
-							while(!buttonAccept.uniquePress())
-							{
+							if(buttonPlus.isPressed()) //submenu wybor adresu
+							{				
+								lcdDisplay.clear();
+								lcdPrint(lcdDisplay,"Adres: ",0);									
+								while(!buttonAccept.uniquePress()) {
+									//konwersja na string
+									String psAdressString = (String)psAdress;
+									if(psAdress<10) psAdressString = "0" + psAdressString;
+									//wyswietlanie adresu
+									//if(timer2.stepTimer(700)) 
+										lcdPrint(lcdDisplay,psAdressString,1);
+
+									if(buttonPlus.uniquePress()) {
+										psAdress++;
+										if(psAdress>31) psAdress = 31;
+									}
+									if(buttonMinus.uniquePress()) {
+										psAdress--;
+										if(psAdress<0) psAdress = 0;
+									}
+								}
 								//konwersja na string
 								String psAdressString = (String)psAdress;
 								if(psAdress<10) psAdressString = "0" + psAdressString;
-								//wyswietlanie adresu
-								//if(timer2.stepTimer(700)) 
-									lcdPrint(lcdDisplay,psAdressString,1);
-
-								if(buttonPlus.uniquePress())
-								{
-									psAdress++;
-									if(psAdress>31) psAdress = 31;
-								}
-								if(buttonMinus.uniquePress())
-								{
-									psAdress--;
-									if(psAdress<0) psAdress = 0;
-								}
+								//wysłanie komendy
+								sendCommand(rs485,"SESS"+psAdressString);
 							}
-							//konwersja na string
-							String psAdressString = (String)psAdress;
-							if(psAdress<10) psAdressString = "0" + psAdressString;
-							//wysłanie komendy
-							sendCommand(rs485,"SESS"+psAdressString);
-						}
-						break;
+							break;
 						}
 						
 						case 2: break;
@@ -236,36 +231,8 @@ void loop()
 					}
 					
 					if(buttonAccept.timePressed() > 1000) submenuOption = endLoop;
-						/*switch(submenuOption)
-						{
-						case 1:
-						lcdDisplay.setCursor(0,0);
-						lcdDisplay.print("SUB 1");
-						break;
-						
-						case 2:
-						lcdDisplay.setCursor(0,0);
-						lcdDisplay.print("SUB 2");
-						break;
-						
-						default: break;
-						}*/
-					if(menuOption == endLoop) break;
-					
-					
+					if(menuOption == endLoop) break;		
 				}
-				/*String napis = "dobrze";
-				rs485.print(napis);
-				while(rs485.read() != -1);
-				digitalWrite(receiveEnablePin,HIGH);
-				digitalWrite(dataEnablePin,LOW);
-				int czas =0;
-				while(!rs485.available()) {}
-				
-				napis = rs485.readStringUntil(0x0D);
-				rs485.print(napis+" ");
-				digitalWrite(receiveEnablePin,LOW);
-				digitalWrite(dataEnablePin,HIGH);*/
 			}
 			//break case
 			break;
@@ -298,6 +265,7 @@ void loop()
 					
 					case 2: //włączone
 					{
+						boolean safetyCondition = false; //warunek bezpieczeństwa
 						lcdDisplay.setCursor(0,0);
 						lcdDisplay.print("V:");
 						lcdDisplay.setCursor(10,0);
@@ -306,12 +274,21 @@ void loop()
 						lcdDisplay.print("C:");
 						lcdDisplay.setCursor(10,1);
 						lcdDisplay.print("T:");
-						current = 20;
-						sendCommand(rs485,"CURR"+psAdressString+"020");
+						current = 40;
+						//przekształcenie wartości prądu na String
+						String currString;
+						if(current < 10) currString = "00" + (String)current;
+						else if(current < 100) currString = "0"+(String)current;
+						else if(current < 1000) currString = (String)current;
+						else currString = "0";
+						
+						//wysłanie komendy
+						sendCommand(rs485,"CURR"+psAdressString+currString);
 						Timer timerReg;
-						while(!buttonAccept.uniquePress())
+						while(!buttonAccept.isPressed())
 						{
 							if(timerReg.stepTimer(500))
+							//if(millis()%500<10)
 							{
 								float temperature = tValue.getTempValue(thermocouple);
 								displayTemp(temperature, lcdDisplay, 1);
@@ -339,8 +316,26 @@ void loop()
 								sendCommand(rs485,"VOLT"+psAdressString+voltageString);
 								
 								//warunek bezpieczeństwa
-								if(temperature > tDesired.value() + 5) break;
+								if(temperature > tDesired.value() + 20) safetyCondition = true;
+								
+								//zabezpieczenie
+								while( isnan(thermocouple.readCelsius()) || safetyCondition) 
+								{
+									lcdDisplay.setCursor(0,0);
+									lcdDisplay.print("BLAD!!! Sprawdz");
+									lcdDisplay.setCursor(0,1);
+									if(!safetyCondition)
+										lcdDisplay.print("termopare");
+									else lcdDisplay.print("temperature");
+									delay(2000);
+									lcdDisplay.clear();
+									sendCommand(rs485,"VOLT"+psAdressString+"000");
+									delay(10);
+									sendCommand(rs485,"CURR"+psAdressString+"000");
+									if(tValue.getTempValue(thermocouple) < tDesired.value() + 5 ) safetyCondition = false;
+								}
 							}
+							
 						}
 						sendCommand(rs485,"VOLT"+psAdressString+"000");
 						delay(10);
@@ -355,6 +350,7 @@ void loop()
 			//case break
 			break;
 		}
+		
 		default: break;
 	}
 }
