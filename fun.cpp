@@ -11,51 +11,43 @@
 /* ------------------------TEMPERATURE----------------------------- */
 
 
-Temperature::Temperature(float tv)
-{
+Temperature::Temperature(float tv) {
 	val = tv;
 }
 
-float Temperature::increaseDesired(float howMuch)
-{
+float Temperature::increaseDesired(float howMuch) {
 	if (desired>= 50) return 50;
 	else return desired += howMuch;
 }
 
-float Temperature::decreaseDesired(float howMuch)
-{
+float Temperature::decreaseDesired(float howMuch) {
 	if (desired<=0) return 0;
 	else return desired -= howMuch;
 }
 
-float Temperature::getTempValue(MAX6675 thermocouple)
-{
+float Temperature::getTempValue(MAX6675 thermocouple) {
 	return 0.95*(thermocouple.readCelsius()) - 11.58;
 }
 	
-float Temperature::value()
-{
+float Temperature::value() {
 	return val;
 }
 
 
-float Temperature::set(float setting)
-{
+float Temperature::set(float setting) {
 	val = setting;
 	return val;
 }
 
 
 /*----------------------------TIMER----------------------------------------*/
-Timer::Timer()
-{
+Timer::Timer() {
 	millisecNow = millis();
 	millisecStart = millis();
 	threshold = 20;
 }
 
-boolean Timer::stepTimer(unsigned long milliseconds)
-{
+boolean Timer::stepTimer(unsigned long milliseconds) {
 	millisecNow = millis();
 	if( (millisecNow - millisecStart > milliseconds) && (millisecNow - millisecStart)%milliseconds < threshold )
 	{
@@ -68,8 +60,7 @@ boolean Timer::stepTimer(unsigned long milliseconds)
 
 /*----------------------------MANSON 2405---------------------------------*/
 
-String Manson2405::getResponse(SoftwareSerial rs485)
-{
+String Manson2405::getResponse(SoftwareSerial rs485) {
 	rs485.begin(9600);
 	String response;
 	while(rs485.read() != -1);
@@ -87,8 +78,7 @@ String Manson2405::getResponse(SoftwareSerial rs485)
 
 
 /*--------------------------REGULATOR PID--------------------------------*/
-float RegulacjaPID::regulator(float w_zad, float wy_o) 
-{
+float RegulacjaPID::regulator(float w_zad, float wy_o)  {
     float k=200;
     float k_i = 0.002;
     float k_d = 20;
@@ -124,15 +114,13 @@ float RegulacjaPID::regulator(float w_zad, float wy_o)
 /*
 	INNE
 */
-extern void lcdPrint(LiquidCrystal lcd, String napis, int rzad)
-{
+extern void lcdPrint(LiquidCrystal lcd, String napis, int rzad) {
 	lcd.setCursor(0,rzad);
 	lcd.print(napis);
 }
 
 //przewijanie napisu po ekranie gdy ilo�� znak�w wi�ksza od 16 
-extern void lcd16RollString(LiquidCrystal lcd, String napis, int rzad)
-{
+extern void lcd16RollString(LiquidCrystal lcd, String napis, int rzad) {
     if(napis.length()>16){
     for(int i =0;i<=(napis.length()-16);i++)
     {
@@ -152,8 +140,7 @@ extern void lcd16RollString(LiquidCrystal lcd, String napis, int rzad)
   
   
 //wyświetlanie wartości liczbowej, 4 ostatnie znaki na wyświetlaczu lcd
-extern void displayTemp(float value, LiquidCrystal lcd, int row)
-{
+extern void displayTemp(float value, LiquidCrystal lcd, int row) {
 	if (value < 10) //liczby jednocyfrowe
 	{
 		lcd.setCursor(12,row);
@@ -173,10 +160,7 @@ extern void displayTemp(float value, LiquidCrystal lcd, int row)
 	}
 }
 
-extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired)
-{
-	//while(true)
-	//{
+extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired) {
 	int wspolczynnik;
 	wspolczynnik =(int)(regulacja.regulator(tDesired,tValue));
 	tValue += (wspolczynnik/10)*0.5;
@@ -189,12 +173,10 @@ extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired)
 	tValue -= randTemp;
 	analogWrite(11,map(wspolczynnik,0,100,0,255));
 	delay(200);
-	//}
 }
 
 //WYŚLIJ KOMENDĘ
-extern String sendCommand(SoftwareSerial rs, String caption)
-{
+extern String sendCommand(SoftwareSerial rs, String caption) {
 	rs.print(caption);
 	rs.write(0x0D);
 	return caption;

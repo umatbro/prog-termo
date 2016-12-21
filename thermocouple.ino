@@ -45,30 +45,28 @@ int maxVoltage = 150; //wartości napięcia w woltach = voltage/10; wartości pr
 
 
 void setup() {
-  timer2.threshold = 100;
-  //Serial.begin(9600);
-  
-  //ustawienia rs485
-  rs485.begin(9600);
-  pinMode(receiveEnablePin,OUTPUT);
-  pinMode(dataEnablePin,OUTPUT);
-  digitalWrite(receiveEnablePin,LOW);
-  digitalWrite(dataEnablePin,HIGH);
+	timer2.threshold = 100;
+	//Serial.begin(9600);
 
-  //ustawienie pinów
-  
-  //ustawienie ekranu
-  lcdDisplay.begin(16,2);
-  
-  lcdDisplay.clear();
-  lcdDisplay.setCursor(0,0);
-  lcdDisplay.print("USTAW   |  START");
-    
-  lcdDisplay.setCursor(0,1);
-  lcdDisplay.print("-/+"+(String)(tValue.getTempValue(thermocouple)));
-  displayTemp(tDesired.value(),lcdDisplay,1);
-  
-  
+	//ustawienia rs485
+	rs485.begin(9600);
+	pinMode(receiveEnablePin,OUTPUT);
+	pinMode(dataEnablePin,OUTPUT);
+	digitalWrite(receiveEnablePin,LOW);
+	digitalWrite(dataEnablePin,HIGH);
+
+	//ustawienie pinów
+
+	//ustawienie ekranu
+	lcdDisplay.begin(16,2);
+
+	lcdDisplay.clear();
+	lcdDisplay.setCursor(0,0);
+	lcdDisplay.print("USTAW   |  START");
+
+	lcdDisplay.setCursor(0,1);
+	lcdDisplay.print("-/+"+(String)(tValue.getTempValue(thermocouple)));
+	displayTemp(tDesired.value(),lcdDisplay,1);
 }
 
 void loop() 
@@ -285,7 +283,7 @@ void loop()
 						//wysłanie komendy
 						sendCommand(rs485,"CURR"+psAdressString+currString);
 						Timer timerReg;
-						while(!buttonAccept.isPressed())
+						while(!buttonAccept.isPressed()) 
 						{
 							if(timerReg.stepTimer(500))
 							//if(millis()%500<10)
@@ -335,7 +333,6 @@ void loop()
 									if(tValue.getTempValue(thermocouple) < tDesired.value() + 5 ) safetyCondition = false;
 								}
 							}
-							
 						}
 						sendCommand(rs485,"VOLT"+psAdressString+"000");
 						delay(10);
