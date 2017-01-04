@@ -239,8 +239,8 @@ void loop()
 						lcdDisplay.print("V:");
 						lcdDisplay.setCursor(10,0);
 						lcdDisplay.print("U:"+(String)(tDesired.value()));
-						lcdDisplay.setCursor(0,1);
-						lcdDisplay.print("C:");
+						// lcdDisplay.setCursor(0,1);
+						// lcdDisplay.print("C:");
 						lcdDisplay.setCursor(10,1);
 						lcdDisplay.print("T:");
 						current = 40;
@@ -259,8 +259,8 @@ void loop()
 							//if(millis()%500<10)
 								float temperature = tValue.getTempValue(thermocouple);
 								displayTemp(temperature, lcdDisplay, 1);
-								lcdDisplay.setCursor(3,1);
-								lcdDisplay.print((String)(current/100.00));
+								// lcdDisplay.setCursor(3,1);
+								// lcdDisplay.print((String)(current/100.00));
 								//potrzebny voltage
 								voltage = maxVoltage*(reg.regulator(tDesired.value(), temperature))/100.00;
 								lcdDisplay.setCursor(2,0);
