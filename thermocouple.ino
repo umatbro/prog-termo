@@ -1,6 +1,6 @@
 #include <LiquidCrystal.h>
 #include <SoftwareSerial.h>
-#include "fun.h"
+#include "proj.h"
 
 //wyświetlacz
 LiquidCrystal lcdDisplay(2,3,4,5,6,7);
