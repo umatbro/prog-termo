@@ -15,10 +15,7 @@ class Temperature
 		float val; //obecna wartość temperatury
 	
 	public:
-		float 	desired; //pożądana wartosc temperatury - nieużywane
 				Temperature(float=0); //konstruktor
-		float 	increaseDesired(float howMuch); //zwiększa oczekiwaną (desidred) wartośc o howMuch i zwraca wynik dodawania
-		float 	decreaseDesired(float howMuch); //zmniejsza oczekiwaną wartość (desired) o howMuch i zwraca wynik odejmowania
 		float 	getTempValue(MAX6675);
 		float	value();
 		float 	set(float); //ustawia podaną temperaturę i zwraca jej wartość
@@ -37,7 +34,7 @@ class Timer
 	public: 
 						Timer();
 		long int		threshold;
-		boolean 		stepTimer(unsigned long); //zwraca true cyklicznie co ileś milisekund, pozwala na wykonanie jakiejś akcji co pewien czas
+		boolean 		stepTimer(unsigned long); //zwraca true cyklicznie co określoną ilość milisekund, pozwala na wykonanie jakiejś akcji co pewien czas
 };
 
 /*
@@ -53,31 +50,35 @@ class Manson2405
 		//const byte dataEnablePin = 12;
 	public:
 		//Manson2405(rs485,byte=0,byte=1,byte=11,byte=12);
-		void sendCommand(String, SoftwareSerial); //wysyła komendę do zasilacza
-		void sendBytes(String,byte,byte);
+		String sendCommand(SoftwareSerial, String); //wysyła komendę do zasilacza
 		String getResponse(SoftwareSerial); // zwraca odpowiedź zasilacza
-		String startSession(SoftwareSerial); // wyłącza przedni panel
-		String endSession(SoftwareSerial); // włącza przedni panel i kończy sesję
+		String startSession(SoftwareSerial, int); // wyłącza przedni panel
+		String endSession(SoftwareSerial, int); // włącza przedni panel i kończy sesję
 };
 
 /*	
 	Regulator PID
 */
 	
-class RegulacjaPID 
+class RegPID 
 {
-private:
-	
-public:
-	float regulator(float w_zad, float wy_o);
+	private:
+		float k;
+		float k_i;
+		float k_d;
+		
+	public:
+		void setK(float);
+		void setKI(float);
+		void setKD(float);
+		RegPID(float =100,float=0.002,float =20);
+		float regulator(float , float );
 };
 
 
 
 //INNE
 extern void lcdPrint(LiquidCrystal lcd, String napis, int rzad);
-extern void lcd16RollString(LiquidCrystal lcd, String napis, int rzad);
 extern void displayTemp(float value, LiquidCrystal lcd, int row);
-extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired);
 extern boolean stepTimer(int miliseconds); 
 extern String sendCommand(SoftwareSerial rs, String caption);

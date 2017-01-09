@@ -15,18 +15,9 @@ Temperature::Temperature(float tv) {
 	val = tv;
 }
 
-float Temperature::increaseDesired(float howMuch) {
-	if (desired>= 50) return 50;
-	else return desired += howMuch;
-}
-
-float Temperature::decreaseDesired(float howMuch) {
-	if (desired<=0) return 0;
-	else return desired -= howMuch;
-}
-
 float Temperature::getTempValue(MAX6675 thermocouple) {
-	return 0.95*(thermocouple.readCelsius()) - 11.58;
+	val = 0.95*(thermocouple.readCelsius()) - 11.58;
+	return val;
 }
 	
 float Temperature::value() {
@@ -49,8 +40,7 @@ Timer::Timer() {
 
 boolean Timer::stepTimer(unsigned long milliseconds) {
 	millisecNow = millis();
-	if( (millisecNow - millisecStart > milliseconds) && (millisecNow - millisecStart)%milliseconds < threshold )
-	{
+	if( (millisecNow - millisecStart > milliseconds) && (millisecNow - millisecStart)%milliseconds < threshold ) {
 		millisecStart = millis();
 		return true;
 	}
@@ -63,6 +53,7 @@ boolean Timer::stepTimer(unsigned long milliseconds) {
 String Manson2405::getResponse(SoftwareSerial rs485) {
 	rs485.begin(9600);
 	String response;
+	rs485.listen();
 	while(rs485.read() != -1);
 	//zmiana na odczyt
 	digitalWrite(11,HIGH); //receiveEnablePin
@@ -76,30 +67,64 @@ String Manson2405::getResponse(SoftwareSerial rs485) {
 	return response;
 }
 
+String Manson2405::sendCommand(SoftwareSerial rs, String caption) {
+	rs.print(caption);
+	rs.write(0x0D);
+	return caption;
+}
+
+String Manson2405::startSession(SoftwareSerial rs, int adress){
+	String adressString = (String)adress;
+	if(adress<10) adressString = "0" + adressString;
+	
+	sendCommand(rs, "SESS"+adressString);
+	return adressString;
+}
+
+String Manson2405::endSession(SoftwareSerial rs, int adress){
+	String adressString = (String)adress;
+	if(adress<10) adressString = "0" + adressString;
+	
+	sendCommand(rs,"ENDS"+adressString);
+	return adressString;
+}
 
 /*--------------------------REGULATOR PID--------------------------------*/
-float RegulacjaPID::regulator(float w_zad, float wy_o)  {
-    float k=200;
-    float k_i = 0.002;
-    float k_d = 20;
+void RegPID::setK(float value){
+	k = value;
+}
+void RegPID::setKI(float value){
+	k_i = value;
+}
+void RegPID::setKD(float value){
+	k_d = value;
+}
+
+RegPID::RegPID(float k_, float k_i_, float k_d_){
+	setK(k_);
+	setKI(k_i_);
+	setKD(k_d_);
+}
+
+float RegPID::regulator(float desired, float tval)  {
 
     //zmienne pomocnicze
     float p,i,d,r;
     float u; //uchyb regulacji
     static float u_p = 0; //uchyb regulacji w poprzednim wywo�aniu
     static float su = 0; //suma minionych uchyb�w regulacji
-    u = w_zad - wy_o; // aktualny uchyb regulacji
+    u = desired - tval; // aktualny uchyb regulacji
 
 	// wyznaczenie skladnika proporcjonalnego
     p = k * u;
 
-	// wyznaczenie składnika ca?kowego
+	// wyznaczenie składnika całkowego
 	su = su + u; //najpierw trzeba wyliczyć sumę wszystkich uchybów;
 	i = k_i * su;
 
 	// wyznaczenie składnika D
 	d = k_d * (u-u_p);
-	u_p = u; //zapamitaj chwilową wartość uchybu dla przyszłych obliczeń
+	u_p = u; //zapisanie chwilowej wartości uchybu
 
 	r = p + i + d; //sygnał wyjściowy regulatora
 
@@ -122,62 +147,36 @@ extern void lcdPrint(LiquidCrystal lcd, String napis, int rzad) {
 //przewijanie napisu po ekranie gdy ilo�� znak�w wi�ksza od 16 
 extern void lcd16RollString(LiquidCrystal lcd, String napis, int rzad) {
     if(napis.length()>16){
-    for(int i =0;i<=(napis.length()-16);i++)
-    {
-      //lcd.clear();
-      lcd.setCursor(0,rzad);
-      for(int j=i;j<=i+15;j++)
-      {
-        if(j<napis.length()){lcd.print(napis[j]);}
-      }
-      delay(1000);
-    }}
-    else{lcd.setCursor(0,rzad);
-    for(int i=0;i<napis.length();i++){
-    lcd.print(napis[i]);}
+		for(int i =0;i<=(napis.length()-16);i++) {
+		  //lcd.clear();
+		  lcd.setCursor(0,rzad);
+		  for(int j=i;j<=i+15;j++) {
+			if(j<napis.length()){lcd.print(napis[j]);}
+		  }
+		  delay(1000);
+		}
+	} else {
+		lcd.setCursor(0,rzad);
+		for(int i=0;i<napis.length();i++){
+			lcd.print(napis[i]);
+		}
     }
 }
   
   
 //wyświetlanie wartości liczbowej, 4 ostatnie znaki na wyświetlaczu lcd
 extern void displayTemp(float value, LiquidCrystal lcd, int row) {
-	if (value < 10) //liczby jednocyfrowe
-	{
+	if (value < 10) { //liczby jednocyfrowe
 		lcd.setCursor(12,row);
 		lcd.print(" ");
 		lcd.setCursor(13,row);
 		lcd.print((String)value);
 	}
-	else if (value >= 10 && value <100 ) //liczby dwucyfrowe
-	{
+	else if (value >= 10 && value <100 ) { //liczby dwucyfrowe
 		lcd.setCursor(12,row);
 		lcd.print((String)value);
-	}
-	else
-	{
+	} else{
 		lcd.setCursor(13,row);
 		lcd.print("err");
 	}
-}
-
-extern void tempSimul(RegulacjaPID regulacja, float& tValue, float tDesired) {
-	int wspolczynnik;
-	wspolczynnik =(int)(regulacja.regulator(tDesired,tValue));
-	tValue += (wspolczynnik/10)*0.5;
-	
-	Serial.print(tDesired);
-	Serial.print("\t");
-	Serial.println(tValue);
-	randomSeed(analogRead(A5));
-	float randTemp = (random(0,700))/100;
-	tValue -= randTemp;
-	analogWrite(11,map(wspolczynnik,0,100,0,255));
-	delay(200);
-}
-
-//WYŚLIJ KOMENDĘ
-extern String sendCommand(SoftwareSerial rs, String caption) {
-	rs.print(caption);
-	rs.write(0x0D);
-	return caption;
 }
