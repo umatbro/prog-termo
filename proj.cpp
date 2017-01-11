@@ -109,22 +109,22 @@ RegPID::RegPID(float k_, float k_i_, float k_d_){
 float RegPID::regulator(float desired, float tval)  {
 
     //zmienne pomocnicze
-    float p,i,d,r;
-    float u; //uchyb regulacji
-    static float u_p = 0; //uchyb regulacji w poprzednim wywo�aniu
-    static float su = 0; //suma minionych uchyb�w regulacji
-    u = desired - tval; // aktualny uchyb regulacji
+    float p, i, d, r;
+    float e; //uchyb regulacji
+    static float e_p = 0; //uchyb regulacji w poprzednim wywo�aniu
+    static float s_e = 0; //suma minionych uchyb�w regulacji
+    e = desired - tval; // aktualny uchyb regulacji
 
 	// wyznaczenie skladnika proporcjonalnego
-    p = k * u;
+    p = k * e;
 
 	// wyznaczenie składnika całkowego
-	su = su + u; //najpierw trzeba wyliczyć sumę wszystkich uchybów;
-	i = k_i * su;
+	s_e += e; //najpierw trzeba wyliczyć sumę wszystkich uchybów;
+	i = k_i * s_e;
 
 	// wyznaczenie składnika D
-	d = k_d * (u-u_p);
-	u_p = u; //zapisanie chwilowej wartości uchybu
+	d = k_d * ( e - e_p);
+	e_p = e; //zapisanie chwilowej wartości uchybu
 
 	r = p + i + d; //sygnał wyjściowy regulatora
 
@@ -144,27 +144,8 @@ extern void lcdPrint(LiquidCrystal lcd, String napis, int rzad) {
 	lcd.print(napis);
 }
 
-//przewijanie napisu po ekranie gdy ilo�� znak�w wi�ksza od 16 
-extern void lcd16RollString(LiquidCrystal lcd, String napis, int rzad) {
-    if(napis.length()>16){
-		for(int i =0;i<=(napis.length()-16);i++) {
-		  //lcd.clear();
-		  lcd.setCursor(0,rzad);
-		  for(int j=i;j<=i+15;j++) {
-			if(j<napis.length()){lcd.print(napis[j]);}
-		  }
-		  delay(1000);
-		}
-	} else {
-		lcd.setCursor(0,rzad);
-		for(int i=0;i<napis.length();i++){
-			lcd.print(napis[i]);
-		}
-    }
-}
   
-  
-//wyświetlanie wartości liczbowej, 4 ostatnie znaki na wyświetlaczu lcd
+//wyświetlanie wartości liczbowej value, 4 ostatnie znaki w wierszu row na wyświetlaczu lcd
 extern void displayTemp(float value, LiquidCrystal lcd, int row) {
 	if (value < 10) { //liczby jednocyfrowe
 		lcd.setCursor(12,row);
@@ -175,7 +156,7 @@ extern void displayTemp(float value, LiquidCrystal lcd, int row) {
 	else if (value >= 10 && value <100 ) { //liczby dwucyfrowe
 		lcd.setCursor(12,row);
 		lcd.print((String)value);
-	} else{
+	} else{ //liczby powyżej 100 niewyświetlane
 		lcd.setCursor(13,row);
 		lcd.print("err");
 	}

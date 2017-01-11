@@ -8,14 +8,31 @@ LiquidCrystal lcd(2,3,4,5,6,7);
 //Timery
 Timer tempMeasureTimer;
 Timer timer2;
+Timer timer3;
 
 //przyciski
 Button buttonPlus(8,PULLUP);
 Button buttonMinus(9,PULLUP);
 Button buttonAccept(10,PULLUP);
+
+//temperatury
 Temperature tValue;
 Temperature tDesired(25);
-RegPID reg;
+
+
+// zmienne potrzebne do obliczenia temperatury z ostatnich 5 sekund (10 pomiarów)
+const int sum_l = 10;
+const float sum_length = 10.00;
+float tArray[sum_l];
+float tAverage = 0;
+int iterator = 0;
+float sumT = 0;
+
+//regulator
+int k = 50;
+int k_i = 0.5;
+int k_d = 20;
+RegPID reg(k, k_i, k_d);
 
 //inne
 boolean psConnected = false; //Power Supply connected
@@ -42,7 +59,7 @@ MAX6675 thermocouple(sckPin, csPin, soPin);
 //Zasilacz Manson2405
 Manson2405 powerSupply;
 int voltage = 0, current = 40;
-int maxVoltage = 150; //wartości napięcia w woltach = voltage/10; wartości prądu w amperach = current/100;
+int maxVoltage = 65; //wartości napięcia w woltach = voltage/10; wartości prądu w amperach = current/100;
 
 
 void setup() {
@@ -62,15 +79,40 @@ void setup() {
 	lcd.begin(16,2);
 
 	lcd.clear();
-	lcd.print("USTAW");
-
-	lcd.setCursor(0,1);
-	lcd.print((String)(tValue.getTempValue(thermocouple)));
-	displayTemp(tDesired.value(),lcd,1);
+	delay(500);
+	
+	for (int i = sum_length - 1 ; i >= 0 ; i--){
+		lcd.setCursor(0,0); lcd.print("Czekaj...");
+		lcd.setCursor(0,1); lcd.print(i/2);
+		tArray[i] = tValue.getTempValue(thermocouple);
+		lcd.setCursor(10,0);
+		lcd.print(tArray[i]);
+		delay(500);
+		sumT += tArray[i];
+	}
+	lcd.setCursor(10,0);
+	lcd.print(sumT/sum_length);
+	delay(2000);
+	lcd.clear();
 }
 
 void loop() 
 {
+	if(timer3.stepTimer(500)){
+		tArray[iterator] = tValue.getTempValue(thermocouple);
+		iterator++;
+	}
+	if(iterator == sum_length) {
+		iterator = 0;
+	}
+	sumT = 0;
+	for(int i = 0; i < sum_length; i++){
+		sumT += tArray[i];
+	}
+	tAverage = sumT/sum_length;
+	
+	
+	
 	boolean sTimer = tempMeasureTimer.stepTimer(500);
 	if(sTimer) {
 		//BŁĄD - nie ma podłączonej termopary, jak najszybciej wszystko wyłączyć
@@ -116,7 +158,7 @@ void loop()
 			}
 			lcd.setCursor(0,1);
 			if(sTimer) {
-				lcd.print((String)(tValue.getTempValue(thermocouple))+"    -/+");
+				lcd.print((String)(tAverage)+"    -/+");
 				displayTemp(tDesired.value(),lcd,1);
 			}
 			//break case
@@ -230,11 +272,10 @@ void loop()
 						lcd.print("V:");
 						lcd.setCursor(10,0);
 						lcd.print("U:"+(String)(tDesired.value()));
-						// lcd.setCursor(0,1);
-						// lcd.print("C:");
+						
 						lcd.setCursor(10,1);
 						lcd.print("T:");
-						//current = 40;
+						
 						//przekształcenie wartości prądu na String
 						String currString;
 						if(current < 10) currString = "00" + (String)current;
@@ -247,11 +288,21 @@ void loop()
 						Timer timerReg;
 						while(!buttonAccept.isPressed()) {
 							if(timerReg.stepTimer(500)) {
-							//if(millis()%500<10)
-								float temperature = tValue.getTempValue(thermocouple);
+							
+								tArray[iterator] = tValue.getTempValue(thermocouple);
+								iterator++;
+								if(iterator == sum_length) {
+									iterator = 0;
+								}
+								sumT = 0;
+								for(int i = 0; i < sum_length; i++){
+									sumT += tArray[i];
+								}
+								tAverage = sumT/sum_length;
+								
+								float temperature = tAverage;
 								displayTemp(temperature, lcd, 1);
-								// lcd.setCursor(3,1);
-								// lcd.print((String)(current/100.00));
+								
 								//obliczone napięcie
 								voltage = maxVoltage*(reg.regulator(tDesired.value(), temperature))/100.00;
 								lcd.setCursor(2,0);
