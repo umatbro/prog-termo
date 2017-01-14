@@ -5,10 +5,10 @@
 #include "max6675.h"
 
 class Button;
+
 /*
 TEMPERATURA
 */
-
 class Temperature
 {
 	private:
@@ -25,7 +25,6 @@ class Temperature
 /*
 	TIMER
 */
-
 class Timer
 {
 	private:
@@ -43,9 +42,7 @@ class Timer
 class Manson2405
 {
 	public:
-		//Manson2405(rs485,byte=0,byte=1,byte=11,byte=12);
 		String sendCommand(SoftwareSerial, String); //wysyła komendę do zasilacza
-		String getResponse(SoftwareSerial); // zwraca odpowiedź zasilacza
 		String startSession(SoftwareSerial, int); // wyłącza przedni panel
 		String endSession(SoftwareSerial, int); // włącza przedni panel i kończy sesję
 };
@@ -74,5 +71,3 @@ class RegPID
 //INNE
 extern void lcdPrint(LiquidCrystal lcd, String napis, int rzad);
 extern void displayTemp(float value, LiquidCrystal lcd, int row);
-extern boolean stepTimer(int miliseconds); 
-extern String sendCommand(SoftwareSerial rs, String caption);

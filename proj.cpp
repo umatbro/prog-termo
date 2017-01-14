@@ -1,12 +1,6 @@
 #include "proj.h"
 
 
-/*
-	------------------------------------------------------------------
-							METODY
-	------------------------------------------------------------------
-*/
-
 
 /* ------------------------TEMPERATURE----------------------------- */
 
@@ -49,23 +43,6 @@ boolean Timer::stepTimer(unsigned long milliseconds) {
 
 
 /*----------------------------MANSON 2405---------------------------------*/
-
-String Manson2405::getResponse(SoftwareSerial rs485) {
-	rs485.begin(9600);
-	String response;
-	rs485.listen();
-	while(rs485.read() != -1);
-	//zmiana na odczyt
-	digitalWrite(11,HIGH); //receiveEnablePin
-	digitalWrite(12,LOW); //dataEnablePin
-	while(!rs485.available()) {}
-	response = rs485.readStringUntil(0x0D);
-	//ustawienie na wysyłanie
-	digitalWrite(11,LOW);
-	digitalWrite(12,HIGH);
-	rs485.end();
-	return response;
-}
 
 String Manson2405::sendCommand(SoftwareSerial rs, String caption) {
 	rs.print(caption);
@@ -111,25 +88,25 @@ float RegPID::regulator(float desired, float tval)  {
     //zmienne pomocnicze
     float p, i, d, r;
     float e; //uchyb regulacji
-    static float e_p = 0; //uchyb regulacji w poprzednim wywo�aniu
-    static float s_e = 0; //suma minionych uchyb�w regulacji
-    e = desired - tval; // aktualny uchyb regulacji
+    static float e_p = 0; // poprzedni uchyb
+    static float s_e = 0; // suma poprzednich uchybów
+    e = desired - tval; 
 
 	// wyznaczenie skladnika proporcjonalnego
     p = k * e;
 
 	// wyznaczenie składnika całkowego
-	s_e += e; //najpierw trzeba wyliczyć sumę wszystkich uchybów;
+	s_e += e; // wyliczenie sumy wszystkich uchybów
 	i = k_i * s_e;
 
-	// wyznaczenie składnika D
+	// wyznaczenie składnika różniczkującego
 	d = k_d * ( e - e_p);
-	e_p = e; //zapisanie chwilowej wartości uchybu
+	e_p = e; // zapisanie chwilowej wartości uchybu w pomocniczej zmiennej
 
-	r = p + i + d; //sygnał wyjściowy regulatora
+	r = p + i + d; // sygnał wyjściowy regulatora
 
-	//ograniczenia regulowanej wartości
-	if (r < 0) r = 0; //czyli moc nie może być ujemna
+	// ograniczenia regulowanej wartości
+	if (r < 0) r = 0; 
 	if (r > 100) r = 100;
 
     return r;
@@ -144,7 +121,6 @@ extern void lcdPrint(LiquidCrystal lcd, String napis, int rzad) {
 	lcd.print(napis);
 }
 
-  
 //wyświetlanie wartości liczbowej value, 4 ostatnie znaki w wierszu row na wyświetlaczu lcd
 extern void displayTemp(float value, LiquidCrystal lcd, int row) {
 	if (value < 10) { //liczby jednocyfrowe
