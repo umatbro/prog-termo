@@ -1,3 +1,7 @@
 # prog_termo
-Arduino IDE code
-http://www.manson.com.hk/products/detail/168 - manson sdp 2405 software
+
+BSc Thesis, AGH Kraków
+language: Polish
+
+##***Elaboration of a programmable electric heater thermostat***
+###***Opracowanie programowalnego termostatu grzejnika elektrycznego***
